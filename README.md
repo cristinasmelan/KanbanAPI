@@ -1,111 +1,180 @@
 ﻿# KanbanAPI
-Perfeito! Com base na decisão de utilizar SQL Server e o escopo do projeto, aqui está um modelo de README.md adaptado para o seu projeto de Kanban.
 
----
-
-# Kanban - Teste Técnico
-
-## Descrição do Projeto
-Este projeto implementa um **Kanban com autenticação via ASP.NET Identity**, utilizando **Minimal APIs** no backend e **Blazor Server** no frontend. O objetivo é oferecer um ambiente simples e funcional, onde cada usuário pode visualizar e manipular somente as suas tarefas.
+Este projeto é uma API simples de Kanban construída com ASP.NET Core, que permite gerenciar tarefas associadas a usuários. Ela fornece endpoints para criar, obter, atualizar, excluir tarefas, além de autenticação básica com login de usuário.
 
 ## Tecnologias Utilizadas
-- **.NET 8**
-- **SQL Server** para persistência dos dados.
-- **ASP.NET Identity** para autenticação e controle de acesso.
-- **Minimal APIs** para o backend.
-- **Blazor Server** para o frontend.
-- **Entity Framework Core** para acesso ao banco de dados.
 
-## Funcionalidades
-- **Kanban com Controle de Status**:
-  - Tarefas classificadas em: "A Fazer", "Fazendo", "Finalizado".
-- **Autenticação**:
-  - Login e logout para controle de acesso.
-- **Controle de Visibilidade**:
-  - Cada usuário acessa somente as suas próprias tarefas.
-- **CRUD de Tarefas**:
-  - Adicionar, visualizar, editar e excluir tarefas.
+- ASP.NET Core
+- Microsoft SQL Server (LocalDB)
+- C#
+- Swagger para documentação da API
 
-## Configuração e Instalação
+## Instalação
 
-### Pré-requisitos
-- **SDK .NET 8.0** instalado. [Download aqui](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
-- **SQL Server** instalado e configurado.
-- **Visual Studio** ou qualquer IDE compatível com .NET.
+1. Clone o repositório ou baixe os arquivos do projeto.
+2. Certifique-se de ter o .NET SDK 6.0 ou superior instalado em sua máquina. Você pode baixá-lo [aqui](https://dotnet.microsoft.com/download).
+3. Abra o terminal ou prompt de comando na pasta do projeto.
+4. Execute o comando para restaurar as dependências do projeto:
 
-### Configuração do Banco de Dados
-1. Certifique-se de que o SQL Server está rodando.
-2. No arquivo `appsettings.json`, configure a string de conexão:
-   ```json
-   "ConnectionStrings": {
-       "DefaultConnection": "Server=localhost;Database=KanbanDb;Trusted_Connection=True;MultipleActiveResultSets=true"
-   }
-   ```
-   Ajuste conforme a configuração do seu ambiente.
-
-3. Crie o banco de dados executando os comandos abaixo no terminal:
-   ```bash
-   dotnet ef migrations add InitialCreate
-   dotnet ef database update
-   ```
-
-### Executar o Projeto
-1. Clone este repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/seu-repositorio-kanban.git
-   ```
-
-2. Entre na pasta do projeto:
-   ```bash
-   cd seu-repositorio-kanban
-   ```
-
-3. Restaure as dependências:
    ```bash
    dotnet restore
    ```
 
-4. Execute o projeto:
+5. Em seguida, execute o comando para rodar a aplicação:
+
    ```bash
    dotnet run
    ```
 
-5. Acesse o sistema pelo navegador em `https://localhost:5001`.
+## Estrutura do Projeto
+
+O projeto possui os seguintes componentes principais:
+
+### `TarefaRepository`
+
+Responsável por gerenciar as operações de CRUD para as tarefas no banco de dados.
+
+### `UsuarioRepository`
+
+Gerencia as operações de leitura e validação de usuários.
+
+### `SqlConnection`
+
+Usado para se conectar ao banco de dados SQL Server (LocalDB) para as operações de banco.
 
 ## Endpoints da API
-Aqui estão os principais endpoints disponibilizados pelas Minimal APIs:
 
-### **Autenticação**
-- **POST** `/api/auth/login`: Realiza o login de um usuário.
-- **POST** `/api/auth/register`: Registra um novo usuário.
-- **POST** `/api/auth/logout`: Realiza o logout.
+### 1. **Criar Tarefa**
 
-### **Tarefas**
-- **GET** `/api/tarefas`: Retorna todas as tarefas do usuário autenticado.
-- **POST** `/api/tarefas`: Adiciona uma nova tarefa.
-- **PUT** `/api/tarefas/{id}`: Atualiza uma tarefa existente.
-- **DELETE** `/api/tarefas/{id}`: Exclui uma tarefa.
+- **Método**: `POST`
+- **Endpoint**: `/api/tarefas`
+- **Descrição**: Adiciona uma nova tarefa.
+- **Body** (Exemplo):
 
-## Estrutura do Projeto
-O projeto segue uma organização simples e funcional:
+  ```json
+  {
+    "Titulo": "Tarefa 1",
+    "Descricao": "Descrição da tarefa",
+    "Status": "Em Progresso",
+    "UserId": 1
+  }
+  ```
+
+- **Resposta**: `200 OK` (Tarefa adicionada com sucesso) ou `400 BadRequest` (Usuário não encontrado)
+
+### 2. **Obter Tarefas de um Usuário**
+
+- **Método**: `GET`
+- **Endpoint**: `/api/tarefas/{userId}`
+- **Descrição**: Obtém todas as tarefas associadas a um usuário.
+- **Parâmetros**: `userId` (ID do usuário)
+- **Resposta**:
+
+  ```json
+  [
+    {
+      "Id": 1,
+      "Titulo": "Tarefa 1",
+      "Descricao": "Descrição da tarefa",
+      "Status": "Em Progresso",
+      "UserId": 1
+    }
+  ]
+  ```
+
+### 3. **Atualizar Tarefa**
+
+- **Método**: `PUT`
+- **Endpoint**: `/api/tarefas/{id}`
+- **Descrição**: Atualiza os dados de uma tarefa existente.
+- **Body** (Exemplo):
+
+  ```json
+  {
+    "Titulo": "Tarefa 1 Atualizada",
+    "Descricao": "Nova descrição",
+    "Status": "Concluída",
+    "UserId": 1
+  }
+  ```
+
+- **Resposta**: `200 OK` (Tarefa atualizada com sucesso) ou `404 NotFound` (Tarefa não encontrada)
+
+### 4. **Excluir Tarefa**
+
+- **Método**: `DELETE`
+- **Endpoint**: `/api/tarefas/{id}`
+- **Descrição**: Exclui uma tarefa pelo ID.
+- **Resposta**: `200 OK` (Tarefa excluída com sucesso)
+
+### 5. **Obter Usuários**
+
+- **Método**: `GET`
+- **Endpoint**: `/api/usuarios`
+- **Descrição**: Obtém todos os usuários cadastrados no sistema.
+- **Resposta**:
+
+  ```json
+  [
+    {
+      "Id": 1,
+      "Email": "usuario@exemplo.com"
+    }
+  ]
+  ```
+
+### 6. **Login de Usuário**
+
+- **Método**: `POST`
+- **Endpoint**: `/api/auth/login`
+- **Descrição**: Realiza o login do usuário, validando o e-mail e a senha.
+- **Parâmetros**: `email`, `senha`
+- **Resposta**: `200 OK` (Login realizado com sucesso) ou `400 BadRequest` (E-mail ou senha incorretos)
+
+## Autenticação (Login)
+
+O login atualmente utiliza uma validação simples de senha (não recomendada para produção). O fluxo básico é:
+
+1. O usuário envia o e-mail e a senha.
+2. A API valida se o e-mail existe no banco de dados e se a senha corresponde.
+3. Em uma versão futura, o login pode ser aprimorado com o uso de hashing de senhas e JWT para autenticação segura.
+
+## Exemplo de Requisições
+
+### Criar Tarefa (POST)
+
+```bash
+curl -X POST "https://localhost:5001/api/tarefas" -H "Content-Type: application/json" -d '{"Titulo":"Tarefa 1", "Descricao":"Tarefa inicial", "Status":"Em Progresso", "UserId": 1}'
 ```
-KanbanAPI/
-├── Controllers/        # Minimal APIs organizadas
-├── Data/               # Configuração do DbContext
-├── Models/             # Classes de domínio (Tarefa, Usuário)
-├── Pages/              # Blazor Server Components
-├── wwwroot/            # Arquivos estáticos
-├── appsettings.json    # Configuração geral do projeto
-└── Program.cs          # Ponto de entrada do aplicativo
+
+### Obter Tarefas (GET)
+
+```bash
+curl -X GET "https://localhost:5001/api/tarefas/1"
 ```
 
-## Próximos Passos
-- Adicionar suporte para drag-and-drop nas colunas do Kanban.
-- Melhorar o design visual com integração de frameworks CSS modernos.
+### Atualizar Tarefa (PUT)
 
-## Licença
-Este projeto é livre para uso. Consulte o arquivo `LICENSE` para mais detalhes.
+```bash
+curl -X PUT "https://localhost:5001/api/tarefas/1" -H "Content-Type: application/json" -d '{"Titulo":"Tarefa Atualizada", "Descricao":"Descrição modificada", "Status":"Concluída", "UserId": 1}'
+```
 
----
+### Excluir Tarefa (DELETE)
 
-Espero que esse README seja claro e detalhado para apresentar o projeto! Caso precise de mais ajustes ou queira adicionar informações adicionais, é só avisar! 🚀
+```bash
+curl -X DELETE "https://localhost:5001/api/tarefas/1"
+```
+
+### Login (POST)
+
+```bash
+curl -X POST "https://localhost:5001/api/auth/login" -d "email=usuario@exemplo.com&senha=senha123"
+```
+
+## Desenvolvimento
+
+Para desenvolver a API:
+
+1. Implemente as funcionalidades do CRUD (Create, Read, Update, Delete) nas classes `TarefaRepository` e `UsuarioRepository`.
+2. Adicione melhorias como autenticação JWT e criptografia de senha.
+3. Implemente testes para garantir a qualidade do código.

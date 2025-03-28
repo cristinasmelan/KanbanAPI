@@ -1,4 +1,6 @@
-﻿namespace KanbanAPI.Models
+﻿using System.Text.Json.Serialization;
+
+namespace KanbanAPI.Models
 {
     public class Usuario
     {
@@ -12,12 +14,14 @@
     public class Tarefa
     {
         public long Id { get; set; }
-        public required string Titulo { get; set; }
-        public required string Descricao { get; set; }
-        public required string Status { get; set; }
+        public string Titulo { get; set; }
+        public string Descricao { get; set; }
+        public string Status { get; set; }
         public DateTime Data { get; set; }
         public long UserId { get; set; }
-        public required Usuario Usuario { get; set; }
+
+        [JsonIgnore]
+        public Usuario? Usuario { get; set; }
     }
 
 }
